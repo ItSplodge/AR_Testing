@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Markerless AR with MindAR.js - Black Screen Fix Attempt</title>
+    <title>Markerless AR with MindAR.js - Simplified Camera Fix</title>
     <!-- Include A-Frame and MindAR.js -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.0/dist/aframe-mindar.min.js"></script>
@@ -33,10 +33,10 @@
             vr-mode-ui="enabled: false"
             device-orientation-permission-ui="enabled: true">
 
-            <!-- MindAR Camera to connect to the real-world feed -->
+            <!-- MindAR Camera for accessing the real-world feed -->
             <a-entity mindar-camera></a-entity>
 
-            <!-- Anchor entity to lock model in place with provided model link -->
+            <!-- Anchor entity to lock model in place with the model link -->
             <a-entity
                 mindar-anchor
                 gltf-model="url(https://itsplodge.github.io/AR_Testing/LBP%20V15.glb)"
@@ -47,27 +47,5 @@
             </a-entity>
         </a-scene>
     </div>
-
-    <script>
-        // Ensure proper handling of camera permissions and request video feed explicitly
-        document.addEventListener("DOMContentLoaded", () => {
-            // Explicitly request camera access
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false })
-                .then(function (stream) {
-                    console.log("Camera access successful");
-                    // Attach the stream to a video element to ensure it's working
-                    const videoElement = document.createElement("video");
-                    videoElement.srcObject = stream;
-                    videoElement.setAttribute("playsinline", "true"); // for iOS compatibility
-                    videoElement.muted = true;
-                    videoElement.autoplay = true;
-                    document.body.appendChild(videoElement);
-                })
-                .catch(function (err) {
-                    console.error("Error accessing camera:", err);
-                    alert("Camera access is required for AR. Please enable camera permissions in your browser settings.");
-                });
-        });
-    </script>
 </body>
 </html>
