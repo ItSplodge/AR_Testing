@@ -1,49 +1,72 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+    <title>Markerless AR with WebXR and A-Frame</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe-xr@1.0.0/dist/aframe-xr.js"></script>
-  </head>
-  <body>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-haptics-component/dist/aframe-haptics-component.min.js"></script>
+    <script src="https://unpkg.com/three@0.126.1/build/three.min.js"></script>
+</head>
+<body style="margin: 0; overflow: hidden;">
     <a-scene
-      embedded
-      xrweb="AR, hit-test"
-      vr-mode-ui="enabled: false"
-      arjs="sourceType: webcam;"
-      renderer="colorManagement: true, physicallyCorrectLights"
-      device-orientation-permission-ui="enabled: true">
+        embedded
+        xrweb="AR, hit-test"
+        vr-mode-ui="enabled: false"
+        arjs="sourceType: webcam;"
+        renderer="colorManagement: true, physicallyCorrectLights"
+        device-orientation-permission-ui="enabled: true">
 
-      <!-- Place the model onto detected surfaces -->
-      <a-entity id="box" gltf-model="url(https://itsplodge.github.io/AR_Testing/LBP%20V15.glb)"
-                position="0 0 0"
-                scale="0.2 0.2 0.2"
-                visible="false">
-      </a-entity>
+        <!-- Placeholder for detected surfaces -->
+        <a-box id="hit-marker" position="0 0 0" visible="false" material="color: red; opacity: 0.6;"></a-box>
 
+        <!-- 3D Model to be Placed -->
+        <a-gltf-model id="my-model" visible="false" position="0 0 0" scale="0.2 0.2 0.2" src="https://itsplodge.github.io/AR_Testing/LBP%20V15.glb"></a-gltf-model>
     </a-scene>
 
     <script>
-      // Handle the hit-test logic to place the model on detected surfaces
-      AFRAME.registerComponent('hit-test', {
-        init: function () {
-          const box = document.getElementById('box');
+        AFRAME.registerComponent('hit-test', {
+            init: function () {
+                const scene = this.el.sceneEl;
+                const hitMarker = document.querySelector("#hit-marker");
+                const myModel = document.querySelector("#my-model");
 
-          this.el.sceneEl.addEventListener('enter-vr', () => {
-            navigator.xr.requestSession('immersive-ar', {
-              requiredFeatures: ['hit-test'],
-              optionalFeatures: ['dom-overlay'],
-              domOverlay: { root: document.body }
-            }).then((session) => {
-              session.requestReferenceSpace('viewer').then((refSpace) => {
-                // Handle hit test and place the box
-                // More detailed hit-test handling code would be here
-                box.setAttribute('visible', true);
-              });
-            });
-          });
-        }
-      });
+                // Ensure WebXR is available
+                if (!navigator.xr) {
+                    console.error("WebXR not supported in this browser.");
+                    return;
+                }
+
+                navigator.xr.requestSession('immersive-ar', {
+                    requiredFeatures: ['hit-test'],
+                    optionalFeatures: ['dom-overlay'],
+                    domOverlay: { root: document.body }
+                }).then((session) => {
+                    session.requestReferenceSpace('viewer').then((refSpace) => {
+                        const viewerSpace = refSpace;
+
+                        const onXRFrame = (timestamp, frame) => {
+                            const session = frame.session;
+                            const hitTestResults = frame.getHitTestResults(viewerSpace);
+                            if (hitTestResults.length > 0) {
+                                const pose = hitTestResults[0].getPose(scene.xrFrameOfReference);
+                                const position = pose.transform.position;
+                                
+                                // Update hit-marker position and make it visible
+                                hitMarker.setAttribute('position', `${position.x} ${position.y} ${position.z}`);
+                                hitMarker.setAttribute('visible', true);
+
+                                // Position and make the model visible
+                                myModel.setAttribute('position', `${position.x} ${position.y} ${position.z}`);
+                                myModel.setAttribute('visible', true);
+                            }
+                            session.requestAnimationFrame(onXRFrame);
+                        };
+
+                        session.requestAnimationFrame(onXRFrame);
+                    });
+                });
+            }
+        });
     </script>
-  </body>
+</body>
 </html>
