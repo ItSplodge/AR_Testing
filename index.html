@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Markerless AR with MindAR.js - User Interaction Experiment</title>
+    <title>Markerless AR with MindAR.js - Black Screen Fix Attempt 2</title>
     <!-- Include A-Frame and MindAR.js -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.0/dist/aframe-mindar.min.js"></script>
@@ -44,7 +44,7 @@
     <!-- AR Container for the Scene -->
     <div id="ar-container">
         <a-scene 
-            mindar-image="autoStart: true; uiLoading: yes; uiScanning: yes;"
+            mindar-image="autoStart: false; uiLoading: yes; uiScanning: yes;"
             embedded
             renderer="logarithmicDepthBuffer: true; colorManagement: true;"
             vr-mode-ui="enabled: false"
@@ -66,20 +66,36 @@
     </div>
 
     <script>
-        document.getElementById("start-button").addEventListener("click", () => {
-            // Hide the start button and show the AR container
-            document.getElementById("start-button").style.display = "none";
-            document.getElementById("ar-container").style.display = "block";
+        document.getElementById("start-button").addEventListener("click", async () => {
+            try {
+                // Hide the start button and show the AR container
+                document.getElementById("start-button").style.display = "none";
+                document.getElementById("ar-container").style.display = "block";
 
-            // Start camera access and AR session
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false })
-                .then(function (stream) {
-                    console.log("Camera access successful");
-                })
-                .catch(function (err) {
-                    console.error("Error accessing camera:", err);
-                    alert("Camera access is required for AR. Please enable camera permissions in your browser settings.");
-                });
+                // Request camera access
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+
+                // Check if the stream was obtained successfully
+                if (stream) {
+                    console.log("Camera access successful, starting AR...");
+
+                    // Start MindAR
+                    const sceneEl = document.querySelector("a-scene");
+                    const arSystem = sceneEl.systems["mindar-image-system"];
+                    
+                    // Set the video stream for MindAR
+                    arSystem.start().then(() => {
+                        console.log("MindAR session started successfully");
+                    }).catch((err) => {
+                        console.error("Failed to start MindAR session:", err);
+                    });
+                } else {
+                    console.error("Failed to get camera stream");
+                }
+            } catch (err) {
+                console.error("Error accessing camera:", err);
+                alert("Camera access is required for AR. Please enable camera permissions in your browser settings.");
+            }
         });
     </script>
 </body>
