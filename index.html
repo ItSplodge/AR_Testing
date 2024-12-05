@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Markerless AR Experience with MindAR.js</title>
+    <title>Markerless AR with MindAR.js - Complete Update</title>
     <!-- Include A-Frame and MindAR.js -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar/dist/aframe-mindar.min.js"></script>
@@ -18,15 +18,18 @@
 <body>
     <!-- Set Up Markerless AR Scene -->
     <a-scene mindar-image="autoStart: true; uiLoading: yes;" embedded>
-        <!-- Camera setup -->
-        <a-camera position="0 0 0" look-controls></a-camera>
         
-        <!-- Load your 3D model and configure its position/scale -->
+        <!-- Camera entity for the real-world camera feed -->
+        <a-entity mindar-camera></a-entity>
+        
+        <!-- Anchor entity for the model to lock in place -->
         <a-entity
+            mindar-anchor
             gltf-model="url(https://itsplodge.github.io/AR_Testing/LBP%20V15.glb)"
-            position="0 -1 -1"
+            position="0 0 0"
             scale="0.1 0.1 0.1"
-            rotation="0 0 0">
+            rotation="0 0 0"
+            animation-mixer>
         </a-entity>
     </a-scene>
 </body>
