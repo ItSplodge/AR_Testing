@@ -1,102 +1,21 @@
-<!DOCTYPE html>
 <html>
-<head>
-    <title>Markerless AR with MindAR.js - Black Screen Fix Attempt 2</title>
-    <!-- Include A-Frame and MindAR.js -->
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.0/dist/aframe-mindar.min.js"></script>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            width: 100%;
-            height: 100%;
-        }
-        #ar-container {
-            display: none;
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            background: black;
-        }
-        #start-button {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px;
-            font-size: 18px;
-            background-color: #0062cc;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <!-- Start Button -->
-    <button id="start-button">Start AR</button>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  </head>
+  <body>
+    <a-scene mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+      <a-assets>
+        <img id="card" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.png" />
+        <a-asset-item id="avatarModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/softmind/scene.gltf"></a-asset-item>
+      </a-assets>
 
-    <!-- AR Container for the Scene -->
-    <div id="ar-container">
-        <a-scene 
-            mindar-image="autoStart: false; uiLoading: yes; uiScanning: yes;"
-            embedded
-            renderer="logarithmicDepthBuffer: true; colorManagement: true;"
-            vr-mode-ui="enabled: false"
-            device-orientation-permission-ui="enabled: true">
-
-            <!-- MindAR Camera to connect to the real-world feed -->
-            <a-entity mindar-camera></a-entity>
-
-            <!-- Anchor entity to lock model in place with the model link -->
-            <a-entity
-                mindar-anchor
-                gltf-model="url(https://itsplodge.github.io/AR_Testing/LBP%20V15.glb)"
-                position="0 0 0"
-                scale="0.2 0.2 0.2"
-                rotation="0 0 0"
-                animation-mixer>
-            </a-entity>
-        </a-scene>
-    </div>
-
-    <script>
-        document.getElementById("start-button").addEventListener("click", async () => {
-            try {
-                // Hide the start button and show the AR container
-                document.getElementById("start-button").style.display = "none";
-                document.getElementById("ar-container").style.display = "block";
-
-                // Request camera access
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
-
-                // Check if the stream was obtained successfully
-                if (stream) {
-                    console.log("Camera access successful, starting AR...");
-
-                    // Start MindAR
-                    const sceneEl = document.querySelector("a-scene");
-                    const arSystem = sceneEl.systems["mindar-image-system"];
-                    
-                    // Set the video stream for MindAR
-                    arSystem.start().then(() => {
-                        console.log("MindAR session started successfully");
-                    }).catch((err) => {
-                        console.error("Failed to start MindAR session:", err);
-                    });
-                } else {
-                    console.error("Failed to get camera stream");
-                }
-            } catch (err) {
-                console.error("Error accessing camera:", err);
-                alert("Camera access is required for AR. Please enable camera permissions in your browser settings.");
-            }
-        });
-    </script>
-</body>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      <a-entity mindar-image-target="targetIndex: 0">
+        <a-plane src="#card" position="0 0 0" height="0.552" width="1" rotation="0 0 0"></a-plane>
+        <a-gltf-model rotation="0 0 0 " position="0 0 0.1" scale="0.005 0.005 0.005" src="#avatarModel" animation="property: position; to: 0 0.1 0.1; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate">
+      </a-entity>
+    </a-scene>
+  </body>
 </html>
