@@ -1,39 +1,49 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Markerless AR with MindAR.js - Updated Approach</title>
-    <!-- Include A-Frame and MindAR.js -->
-    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            width: 100%;
-            height: 100%;
-        }
-    </style>
-</head>
-<body>
-    <a-scene 
-        mindar-image="imageTargetSrc: your_target.mind;"
-        color-space="sRGB"
-        renderer="colorManagement: true, physicallyCorrectLights"
-        vr-mode-ui="enabled: false"
-        embedded
-        device-orientation-permission-ui="enabled: true">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-xr@1.0.0/dist/aframe-xr.js"></script>
+  </head>
+  <body>
+    <a-scene
+      embedded
+      xrweb="AR, hit-test"
+      vr-mode-ui="enabled: false"
+      arjs="sourceType: webcam;"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      device-orientation-permission-ui="enabled: true">
 
-        <a-assets>
-            <a-asset-item id="model" src="https://itsplodge.github.io/AR_Testing/LBP%20V15.glb"></a-asset-item>
-        </a-assets>
+      <!-- Place the model onto detected surfaces -->
+      <a-entity id="box" gltf-model="url(https://itsplodge.github.io/AR_Testing/LBP%20V15.glb)"
+                position="0 0 0"
+                scale="0.2 0.2 0.2"
+                visible="false">
+      </a-entity>
 
-        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
-        <!-- Define what the AR should track and anchor -->
-        <a-entity mindar-image-target="targetIndex: 0">
-            <a-gltf-model src="#model" position="0 0 0.1" scale="0.2 0.2 0.2"></a-gltf-model>
-        </a-entity>
     </a-scene>
-</body>
+
+    <script>
+      // Handle the hit-test logic to place the model on detected surfaces
+      AFRAME.registerComponent('hit-test', {
+        init: function () {
+          const box = document.getElementById('box');
+
+          this.el.sceneEl.addEventListener('enter-vr', () => {
+            navigator.xr.requestSession('immersive-ar', {
+              requiredFeatures: ['hit-test'],
+              optionalFeatures: ['dom-overlay'],
+              domOverlay: { root: document.body }
+            }).then((session) => {
+              session.requestReferenceSpace('viewer').then((refSpace) => {
+                // Handle hit test and place the box
+                // More detailed hit-test handling code would be here
+                box.setAttribute('visible', true);
+              });
+            });
+          });
+        }
+      });
+    </script>
+  </body>
 </html>
