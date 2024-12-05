@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Markerless AR with MindAR.js - Camera Fix with Model</title>
+    <title>Markerless AR with MindAR.js - Explicit Camera Permissions</title>
     <!-- Include A-Frame and MindAR.js -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.0/dist/aframe-mindar.min.js"></script>
@@ -51,15 +51,32 @@
     <script>
         // Ensure proper handling of camera permissions
         document.addEventListener("DOMContentLoaded", () => {
+            // Check if permissions API is supported
             if (navigator.permissions) {
                 navigator.permissions.query({ name: "camera" }).then(permissionStatus => {
                     if (permissionStatus.state === "granted") {
                         console.log("Camera access granted");
-                    } else {
-                        console.warn("Camera permission is not granted. Make sure to allow camera access.");
+                    } else if (permissionStatus.state === "prompt") {
+                        console.warn("Camera permission needs to be granted. Make sure to allow access.");
+                    } else if (permissionStatus.state === "denied") {
+                        console.error("Camera access was denied. Please update your browser settings to allow camera access.");
                     }
+                }).catch(error => {
+                    console.error("Error checking camera permission:", error);
                 });
+            } else {
+                console.warn("Permissions API not supported. Manually requesting camera access.");
             }
+
+            // Request camera access if not already provided
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    console.log("Camera access successful");
+                })
+                .catch(function (err) {
+                    console.error("Error accessing camera:", err);
+                    alert("Camera access is required for AR. Please enable camera permissions in your browser settings.");
+                });
         });
     </script>
 </body>
