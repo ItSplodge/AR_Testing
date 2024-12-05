@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Web AR Experience</title>
-    <!-- Include A-Frame and AR.js -->
+    <title>Markerless AR Experience with MindAR.js</title>
+    <!-- Include A-Frame and MindAR.js -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/master/aframe/build/aframe-ar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar/dist/aframe-mindar.min.js"></script>
     <style>
-        /* Basic styling to ensure full-screen AR */
         body, html {
             margin: 0;
             padding: 0;
@@ -17,20 +16,18 @@
     </style>
 </head>
 <body>
-    <!-- A-Frame Scene Definition -->
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-        <!-- Define the marker (using default "hiro" marker) -->
-        <a-marker preset="hiro">
-            <!-- Load the 3D Model -->
-            <a-entity 
-                gltf-model="url(https://itsplodge.github.io/AR_Testing/LBP%20V15.glb)" 
-                position="0 0 0"
-                scale="0.5 0.5 0.5"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 10000">
-            </a-entity>
-        </a-marker>
-        <!-- Camera Entity to Capture the Scene -->
-        <a-entity camera></a-entity>
+    <!-- Set Up Markerless AR Scene -->
+    <a-scene mindar-image="autoStart: true; uiLoading: yes;" embedded>
+        <!-- Camera setup -->
+        <a-camera position="0 0 0" look-controls></a-camera>
+        
+        <!-- Load your 3D model and configure its position/scale -->
+        <a-entity
+            gltf-model="url(https://itsplodge.github.io/AR_Testing/LBP%20V15.glb)"
+            position="0 0 0"
+            scale="1 1 1"
+            animation="property: rotation; to: 0 360 0; loop: true; dur: 10000">
+        </a-entity>
     </a-scene>
 </body>
 </html>
