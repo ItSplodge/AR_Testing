@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Markerless AR with MindAR.js - Simplified Camera Fix</title>
+    <title>Markerless AR with MindAR.js - User Interaction Experiment</title>
     <!-- Include A-Frame and MindAR.js -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.0/dist/aframe-mindar.min.js"></script>
@@ -14,6 +14,7 @@
             height: 100%;
         }
         #ar-container {
+            display: none;
             position: absolute;
             width: 100%;
             height: 100%;
@@ -21,9 +22,25 @@
             left: 0;
             background: black;
         }
+        #start-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            font-size: 18px;
+            background-color: #0062cc;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
+    <!-- Start Button -->
+    <button id="start-button">Start AR</button>
+
     <!-- AR Container for the Scene -->
     <div id="ar-container">
         <a-scene 
@@ -33,7 +50,7 @@
             vr-mode-ui="enabled: false"
             device-orientation-permission-ui="enabled: true">
 
-            <!-- MindAR Camera for accessing the real-world feed -->
+            <!-- MindAR Camera to connect to the real-world feed -->
             <a-entity mindar-camera></a-entity>
 
             <!-- Anchor entity to lock model in place with the model link -->
@@ -47,5 +64,23 @@
             </a-entity>
         </a-scene>
     </div>
+
+    <script>
+        document.getElementById("start-button").addEventListener("click", () => {
+            // Hide the start button and show the AR container
+            document.getElementById("start-button").style.display = "none";
+            document.getElementById("ar-container").style.display = "block";
+
+            // Start camera access and AR session
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false })
+                .then(function (stream) {
+                    console.log("Camera access successful");
+                })
+                .catch(function (err) {
+                    console.error("Error accessing camera:", err);
+                    alert("Camera access is required for AR. Please enable camera permissions in your browser settings.");
+                });
+        });
+    </script>
 </body>
 </html>
