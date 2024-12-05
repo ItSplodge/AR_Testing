@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Web AR Experience</title>
+    <!-- Include A-Frame and AR.js -->
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/master/aframe/build/aframe-ar.min.js"></script>
+    <style>
+        /* Basic styling to ensure full-screen AR */
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- A-Frame Scene Definition -->
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+        <!-- Define the marker (using default "hiro" marker) -->
+        <a-marker preset="hiro">
+            <!-- Load the 3D Model -->
+            <a-entity 
+                gltf-model="url(https://itsplodge.github.io/AR_Testing/LBP%20V15.glb)" 
+                position="0 0 0"
+                scale="0.5 0.5 0.5"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 10000">
+            </a-entity>
+        </a-marker>
+        <!-- Camera Entity to Capture the Scene -->
+        <a-entity camera></a-entity>
+    </a-scene>
+</body>
+</html>
