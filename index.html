@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Markerless AR with MindAR.js - Explicit Camera Permissions</title>
+    <title>Markerless AR with MindAR.js - Black Screen Fix Attempt</title>
     <!-- Include A-Frame and MindAR.js -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.0/dist/aframe-mindar.min.js"></script>
@@ -41,7 +41,7 @@
                 mindar-anchor
                 gltf-model="url(https://itsplodge.github.io/AR_Testing/LBP%20V15.glb)"
                 position="0 0 0"
-                scale="0.1 0.1 0.1"
+                scale="0.2 0.2 0.2"
                 rotation="0 0 0"
                 animation-mixer>
             </a-entity>
@@ -49,29 +49,19 @@
     </div>
 
     <script>
-        // Ensure proper handling of camera permissions
+        // Ensure proper handling of camera permissions and request video feed explicitly
         document.addEventListener("DOMContentLoaded", () => {
-            // Check if permissions API is supported
-            if (navigator.permissions) {
-                navigator.permissions.query({ name: "camera" }).then(permissionStatus => {
-                    if (permissionStatus.state === "granted") {
-                        console.log("Camera access granted");
-                    } else if (permissionStatus.state === "prompt") {
-                        console.warn("Camera permission needs to be granted. Make sure to allow access.");
-                    } else if (permissionStatus.state === "denied") {
-                        console.error("Camera access was denied. Please update your browser settings to allow camera access.");
-                    }
-                }).catch(error => {
-                    console.error("Error checking camera permission:", error);
-                });
-            } else {
-                console.warn("Permissions API not supported. Manually requesting camera access.");
-            }
-
-            // Request camera access if not already provided
-            navigator.mediaDevices.getUserMedia({ video: true })
+            // Explicitly request camera access
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false })
                 .then(function (stream) {
                     console.log("Camera access successful");
+                    // Attach the stream to a video element to ensure it's working
+                    const videoElement = document.createElement("video");
+                    videoElement.srcObject = stream;
+                    videoElement.setAttribute("playsinline", "true"); // for iOS compatibility
+                    videoElement.muted = true;
+                    videoElement.autoplay = true;
+                    document.body.appendChild(videoElement);
                 })
                 .catch(function (err) {
                     console.error("Error accessing camera:", err);
